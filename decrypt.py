@@ -4,10 +4,10 @@ from Crypto.Cipher import AES
 import base64
 import sqlite3
 import json, re, sys
-print '====== SIF4 Decrypt Tool by ieb ======'
+print('====== SIF4 Decrypt Tool by ieb ======')
 if len(sys.argv) == 1:
-    print 'Command-Line usage:', sys.argv[0], '[filename.db_]'
-    filename = raw_input('Filename to decrypt: ')
+    print('Command-Line usage:', sys.argv[0], '[filename.db_]')
+    filename = input('Filename to decrypt: ')
 else:
     filename = sys.argv[1]
 def decrypt(key, content):
@@ -35,7 +35,7 @@ try:
     count = 0
     for i in tables:
         if 'release_tag' in i['sql']:
-            print 'Found Encrypted Table', i['tbl_name']
+            print('Found Encrypted Table', i['tbl_name'])
             cur.execute("SELECT _rowid_ as __rowid, * FROM " + i['tbl_name'] + " WHERE release_tag IS NOT NULL", )
             data = cur.fetchall()
             for item in data:
@@ -48,14 +48,14 @@ try:
                         val = dec[col] if dec[col] != False else None
                         count += 1
                         upd.execute("UPDATE " + i['tbl_name'] + " SET " + col + " = ? WHERE _rowid_ = ?", (val, __rowid))
-						upd.execute("UPDATE " + i['tbl_name'] + " SET release_tag = ? WHERE _rowid_ = ?", (None, __rowid))
+                        upd.execute("UPDATE " + i['tbl_name'] + " SET release_tag = ? WHERE _rowid_ = ?", (None, __rowid))
                 else:
                     if keyid not in notfound:
                         notfound.append(keyid)
     conn.commit()
     if len(notfound):
-        print 'Failed to decrypt key', notfound
-    print 'Successfully Decypted %d Records' % (count)
-except Exception, e:
-    print 'Err:', e
-raw_input('Press Enter To Exit')
+        print('Failed to decrypt key', notfound)
+    print('Successfully Decypted %d Records' % (count))
+except Exception as e:
+    print('Err:', e)
+input('Press Enter To Exit')
