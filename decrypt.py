@@ -17,7 +17,7 @@ def decrypt(key, content):
     encryptor = AES.new(key, mode, IV=IV)
     text = base64.b64decode(content)
     ciphertext = encryptor.decrypt(text)
-    data = re.findall('({".*})', ciphertext)[0]
+    data = re.findall(b'({".*})', ciphertext)[0]
     load = json.loads(data)
     return load
 
