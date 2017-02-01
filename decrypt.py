@@ -48,7 +48,7 @@ try:
                         val = dec[col] if dec[col] is not False else None
                         count += 1
                         upd.execute("UPDATE " + i['tbl_name'] + " SET " + col + " = ? WHERE _rowid_ = ?", (val, __rowid))
-                        upd.execute("UPDATE " + i['tbl_name'] + " SET release_tag = ?, _encryption_release_id = ? WHERE _rowid_ = ?", (None, __rowid))
+                        upd.execute("UPDATE " + i['tbl_name'] + " SET release_tag = ? WHERE _rowid_ = ?", (None, __rowid))
                 else:
                     if keyid not in notfound:
                         notfound.append(keyid)
