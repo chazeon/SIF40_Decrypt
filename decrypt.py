@@ -3,22 +3,29 @@
 from Crypto.Cipher import AES
 import base64
 import sqlite3
-import json, re, sys
+import json, sys
 print('====== SIF4 Decrypt Tool by ieb ======')
 if len(sys.argv) == 1:
     print('Command-Line usage:', sys.argv[0], '[filename.db_]')
     filename = input('Filename to decrypt: ')
 else:
     filename = sys.argv[1]
-def decrypt(key, content):
+
+def decrypt(key, encrypted):
+    unpad = lambda s : s[0:-s[-1]]
     key = base64.b64decode(key)
-    IV = 16 * '\x00'
+    encrypted = base64.b64decode(encrypted)
+
+    iv = encrypted[:16]
+    content = encrypted[16:]
+
     mode = AES.MODE_CBC
-    encryptor = AES.new(key, mode, IV=IV)
-    text = base64.b64decode(content)
-    ciphertext = encryptor.decrypt(text)
-    data = re.findall(b'({".*})', ciphertext)[0]
+    encryptor = AES.new(key, mode, IV=iv)
+
+    data = encryptor.decrypt(content)
+    data = unpad(data)
     load = json.loads(data.decode())
+
     return load
 
 try:
@@ -27,8 +34,7 @@ try:
     cur = conn.cursor()
     upd = conn.cursor()
     keys = json.loads(open("conf.json").read())
-    keypairs = {}
-    for i in keys: keypairs[i['id']] = i['key']
+    keypairs = dict([(i["id"], i["key"]) for i in keys])
     cur.execute("SELECT * FROM sqlite_master WHERE type='table'")
     tables = cur.fetchall()
     notfound = []
